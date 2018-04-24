@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="js/web3.min.js"></script>
+</head>
+<body>
+    <h2>以太報名平台</h2>
+    <h3>報名人數：<em id="people"></em></h3>
+    <h4>報名費為 1.5 eth</h4>
+    <input type="button" id="send" value="報名">
+    <script>
+        var web3 = new Web3(window.web3.currentProvider);
+        var Contract;
+        var abi = [{"constant":true,"inputs":[],"name":"cost","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_applicant","type":"address"}],"name":"getTicket","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"manager","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"payAll","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"people","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"list","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_manager","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"}];
+        var address = '0x58fd12F3040e020d98374Cf07fb8009656c8D276';
+        async function init(){
+            Contract = await new web3.eth.Contract(abi,address);
+            Contract.methods.people().call().then(function(num){
+                document.getElementById('people').textContent = num;
+            });
+
+        }
+        init(); 
+        async function send(){
+            var accounts = await web3.eth.getAccounts();
+            Contract.methods.getTicket(accounts[0])
+            .send({from:accounts[0],value:web3.utils.toWei(0.15, "ether")})
+            .then(function(data){
+                console.log(data);
+            })
+        
+        }
+        document.getElementById('send').addEventListener('click',send);
+    </script>
+</body>
+</html>

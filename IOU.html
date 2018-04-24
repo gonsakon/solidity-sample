@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="js/web3.min.js"></script>
+</head>
+<body>
+    <h2>借據平台</h2>
+    <input type="text" id="A" placeholder="請輸入借款人">
+    <input type="text" id="B" placeholder="請輸入貸款人">
+    <input type="text" id="money" placeholder="請輸入借款金額">
+    
+    <input type="button" id="send" value="送出修改內容">
+    <script>
+        var web3 = new Web3(window.web3.currentProvider);
+        var Contract;
+        var abi = [
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "IOUMessage",
+				"type": "bytes32"
+			}
+		],
+		"name": "createIOU",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "data",
+				"type": "bytes32"
+			},
+			{
+				"indexed": false,
+				"name": "blockNumber",
+				"type": "uint256"
+			}
+		],
+		"name": "IOULog",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "message",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+        var address = '0xb1656f2DAE22D4AeD53F4766f75a06b9596F6e8e';
+        async function init(){
+            Contract = await new web3.eth.Contract(abi,address);
+
+        }
+        init(); 
+        async function send(){
+            var accounts = await web3.eth.getAccounts();
+            var A = document.getElementById('A').value;
+            var B = document.getElementById('B').value;
+            var money = document.getElementById('money').value;
+            var str = A+' borrowed '+money+' USD from '+B;
+            var hexStr = web3.utils.utf8ToHex(str)
+            Contract.methods.createIOU(hexStr)
+            .send({from:accounts[0]})
+            .then(function(data){
+                console.log(data);
+            })
+        
+        }
+        document.getElementById('send').addEventListener('click',send);
+    </script>
+</body>
+</html>
